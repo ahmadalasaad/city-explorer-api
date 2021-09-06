@@ -5,7 +5,6 @@ class Forecast{
     this.describtion=describtion;
   }
 }
-
 const express = require('express') // require the express package
 const app = express() // initialize your express app instance
 const cors = require('cors');
