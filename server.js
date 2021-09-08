@@ -5,6 +5,17 @@ class Forecast{
     this.describtion=describtion;
   }
 }
+class Movies{
+  constructor(title,overview,vote_average,vote_count,poster_path,popularity,release_date){
+    this.title= title,
+    this.overview= overview,
+    this.vote_average= vote_average,
+    this.vote_count= vote_count,
+    this.poster_path= poster_path,
+    this.popularity= popularity,
+    this.release_date=release_date
+  }
+}
 const express = require('express') // require the express package
 const app = express() // initialize your express app instance
 const cors = require('cors');
@@ -13,6 +24,7 @@ app.use(cors())
 const weather = require('./data/weather.json')
 require('dotenv').config();
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const MOVIE_API_KEY =process.env.MOVIE_API_KEY;
 // a server endpoint 
 app.get('/', // our endpoint name
  function (req, res) { // callback function of what we should do with our request
@@ -37,39 +49,20 @@ app.get('/weather', async (request, response) => {
             response.send('no data found :disappointed:')
           }
 
-    // Model the data according to the ticket
-    
-    // response.json(weatherBitResponse.data.data);
   } catch (error) {
     response.json(error.data);
   }
 
-
-  // in order to send a request with axios, we need a URL for weatherbit
 });
-
-
-
-
-
-// app.get('/weather', (req, res) => {
-//   const city_name = req.query.city_name
-//   if (city_name) {
-//     const returnObj = weather.find((item) => {
-//       return item.city_name === city_name;
-//     });
-//     if (returnObj) {
-//       let newArr=returnObj.data.map(item=>{
-//         return new Forecast(item.datetime,item.weather.description)
-//       })
-//       res.send(newArr)
-//     } else {
-//       response.send('no data found :disappointed:')
-//     }
-//   } else {
-//     res.json(weather);
-//   }
-// })
-
-
+//////////////////////
+app.get('/movies', async (request, response) => {
+  const city_name=request.query.query;
+  const moviesUrl='https://api.themoviedb.org/3/search/movie'
+  const moviesResponse= await axios.get(`${moviesUrl}?api_key=${MOVIE_API_KEY}&query=${city_name}`)
+  if (city_name) {
+  let newArr=moviesResponse.data.results.map(element=>{
+    return new Movies(element.title,element.overview,element.vote_average,element.vote_count,element.poster_path,element.popularity,element.release_date);  })
+  response.send(newArr)
+  }else{response.send('no data found :disappointed:')}
+});
 app.listen(3002) // kick start the express server to work
